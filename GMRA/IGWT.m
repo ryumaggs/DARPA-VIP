@@ -1,4 +1,4 @@
-function [Projections, tangentialCorrections] = IGWT(gMRA, XGWT)
+function [Projections, tangentialCorrections, t] = IGWT(gMRA, XGWT)
 
 % Inverse Geometric Wavelet Transform
 %
@@ -50,13 +50,15 @@ if gMRA.opts.verbose > 0, fprintf('done. (%.5f secs)',Timing.preprocessing); end
 %% Go through the leafnodes and invert along the path to the root
 if gMRA.opts.verbose > 0, fprintf('\n\t IGWT: computing inverse...'); end
 Timing.inverting                                     = cputime;
-
+t = {};
+k = 1;
 for i = 1:length(leafIdxswithPts)
     iLeaf       = leafIdxswithPts(i);
     net         = leafNodesWithPts(i);
     netPts      = XGWT.PointsInNet{net}; %sortedLeafNodeLabels_idxs(sortedLeafNodeLabels_cumcounts(i)+1:sortedLeafNodeLabels_cumcounts(i+1));
     nPts        = sortedLeafNodeLabels_counts(i);
-    
+    t{k} = {};
+    l = 1;
     if nPts == 0, continue; end
     
     cur_sum     = 0;
@@ -64,13 +66,15 @@ for i = 1:length(leafIdxswithPts)
     x_matj      = zeros(gMRA.opts.AmbientDimension,nPts,J);
     j_max       = gMRA.Scales(net);                                                                                             % Number of scales involved
     chain       = dpath(gMRA.cp, net);                                                                                          % Path to root
-    
+
     for j = j_max:-1:1
         switch gMRA.opts.Predictor.PredictorType
             case 'none'
                 if ~isempty(gMRA.WavConsts{chain(j)}),   x_tmp = gMRA.WavConsts{chain(j)};   else    x_tmp = 0;  end
                 if ~isempty(gMRA.WavBases{chain(j)}) && ~isempty(XGWT.CelWavCoeffs{iLeaf,j})
                     x_tmp = bsxfun(@plus,gMRA.WavBases{chain(j)}'*XGWT.CelWavCoeffs{iLeaf,j},x_tmp);
+                    t{k}{l} = XGWT.CelWavCoeffs{iLeaf,j};
+                    l = l + 1;
                 end
                 
                 if gMRA.opts.addTangentialCorrections && j>1                                                                            % x_mat is corrected by adding tangential corrections
@@ -98,13 +102,16 @@ for i = 1:length(leafIdxswithPts)
         if isfield(gMRA.opts,'Mean') && ~isempty(gMRA.opts.Mean)
             x_tmp = bsxfun(@plus,x_tmp,gMRA.opts.Mean);
         end
-        
+        % x_tmp is the projection of some points (in netPts) at scale j
         if size(x_tmp,2)==size(x_matj,2)
             x_matj(:,:,j)   = x_tmp;
         end
     end
-    
+    % Set projections at all scales for points in netPts
+    % cum sum will sum up x_matj accross all projections ( projection scale 2 = scale 1 + 2)
+    % projection scale 3 = 1+2+3 and so on.
     Projections(:,netPts,:) = cumsum(x_matj,3);
+    k = k + 1;
 end
 
 Timing.inverting    = cputime-Timing.inverting;

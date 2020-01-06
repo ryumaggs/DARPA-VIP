@@ -208,6 +208,7 @@ if isempty(opts.graph),
             end
             gMRA.Timing.covertree           = cputime;
             gMRA.CoverTree                  = covertree_build( opts.CoverTreeOpts.Samples,opts.CoverTreeBuildOpts );
+            gMRA.CoverTree
             gMRA.Timing.covertree           = cputime-gMRA.Timing.covertree;
             if gMRA.opts.verbose>0; fprintf('done. (%.5f secs)',gMRA.Timing.covertree); end
         else
