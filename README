@@ -1,0 +1,14 @@
+This project is an extension on the GMRA code base implemented by Mauro Maggioni et.al.
+
+GMRA creates multi-scale approximation of high dimensional data. This feature can be exploited to find the low dimension representation of the dataset lie in higher dimension. 
+
+the current setup of GMRA have been tested and can be run directly on Linux system. To run GMRA, first run startup_GMRA.m, then run RunExamples.m to test on multiple dataset.
+the shallow training contains 2 test scripts:
+   - shallow_ff_network.py : a shallow classifier trained on MNIST dataset represented in low dimension
+   - cifar_10_shallow_classifier.ipynb : Applying LeNet architecture to classify CIFAR-10 images when data is represented in low dimension.
+
+these scripts requires '.mat' data to run, this data can be extract by running the GMRA project. However, some preprocessed data is available at:
+
+https://www.dropbox.com/sh/skq1p0q18hy0xjs/AADkGKMoyD6q56xU1Ylca2TFa?dl=0
+
+Any question can be emailed to Hieu Le at hle@bu.edu
