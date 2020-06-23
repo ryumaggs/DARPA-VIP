@@ -399,15 +399,33 @@ switch pExampleName
         X = H3';
         GMRAopts.ManifoldDimension = 0;
     case 'CIFAR10'
-        LoadCifar10
+%         LoadCifar10
+        load('./DiffusionGeometry/Examples/data_batch_1.mat');
+        X1 = data;
+        labels1 = labels;
+        load('./DiffusionGeometry/Examples/data_batch_2.mat');
+        X2 = data;
+        labels2 = labels;
+        load('./DiffusionGeometry/Examples/data_batch_3.mat');
+        X3 = data;
+        labels3 = labels;
+        load('./DiffusionGeometry/Examples/data_batch_4.mat');
+        X4 = data;
+        labels4 = labels;
+        load('./DiffusionGeometry/Examples/data_batch_5.mat');
+        X5 = data;
+        labels5 = labels;
+        labels = [labels1; labels2; labels3; labels4; labels5];
+        X = [X1; X2; X3; X4; X5];
+        X = reshape(X,3072,50000);
         X = ConvertImagesToGrayScale(X,[32,32]); 
         X = abs(fft(X));
-        Labels              = Y;
+        Labels              = labels;
         X0                  = X;
         imgOpts.imageData   = true;
         imgOpts.imR         = 32;
         imgOpts.imC         = 32;
-        imgOpts.Labels      = Y;
+        imgOpts.Labels      = labels;
         imgOpts.isCompressed= false;
     case 'CIFAR100'
         %load('/Volumes/RAID/Data Sets/CIFAR/cifar-100-matlab/train.mat');
